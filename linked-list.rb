@@ -56,7 +56,7 @@ class Linked_List
       node = node.next
       to_s(node, list_graph)
     else
-      return list_graph += "nil"
+      return list_graph += "( #{node.value.to_s} ) -> nil"
     end
   end
 
@@ -66,7 +66,7 @@ class Linked_List
         return node.value
       else
         node = node.next
-        count += 1
+        index += 1
         at(target_index, node, index)
       end
     rescue
@@ -75,12 +75,14 @@ class Linked_List
   end
 
   def pop
+    value = @tail.value
     begin
       @tail = @tail.previous
       @tail.next = nil
     rescue
       @tail = nil
     end
+    value
   end
 
   def contains?(value, node=@head)
@@ -107,6 +109,39 @@ class Linked_List
     end
   end
 
+  def insert_at(target_index, value, node=@head, index=0)
+    begin
+      if index == (target_index)
+        new_node = Node.new(value)
+        node.previous.next = new_node
+        new_node.next = node
+        return
+      else
+        node = node.next
+        index += 1
+        insert_at(target_index, value, node, index)
+      end
+    rescue
+      return puts "Index must be a location between two nodes"
+    end
+  end
+
+  def remove_at(target_index, node=@head, index=0)
+    begin
+      if index == (target_index)
+        node.previous.next = node.next if node.previous
+        node.next.previous = node.previous if node.next
+        node.value = nil
+        return
+      else
+        node = node.next
+        index += 1
+        remove_at(target_index, node, index)
+      end
+    rescue
+      return puts "Index not found"
+    end
+  end
 
 end
 
@@ -129,14 +164,17 @@ list.append("cherry")
 list.append("durian")
 list.prepend("eggplant")
 
-puts "Head: #{list.head}"
-puts "Tail: #{list.tail}"
-puts "Size: #{list.size}"
+puts "\nHead: ( #{list.head} ) Tail: ( #{list.tail} ) Size: #{list.size}"
 puts list.to_s
-puts "Index at [2]: #{list.at(2)}"
-list.pop
-puts "List after pop:"
+puts "\nList after popping ( #{list.pop} ):"
 puts list.to_s
-puts "List contains 'potato': #{list.contains?("potato")}"
-puts "List contains 'banana': #{list.contains?("banana")}"
-puts "'Banana' is at index: #{list.find("banana")}"
+puts "\nList contains ( potato ): #{list.contains?("potato")}"
+puts "List contains ( banana ): #{list.contains?("banana")}"
+puts "\n( banana ) is at index: #{list.find("banana")}"
+puts "Value of node at index [3]: ( #{list.at(3)} )"
+puts "\nList with ( pineapple ) inserted at index [2]:"
+list.insert_at(2, "pineapple")
+puts list.to_s
+puts "\nList with ( #{list.at(1)} ) removed:"
+list.remove_at(1)
+puts list.to_s
